@@ -1,0 +1,222 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+}
+
+#dashboardPage{
+    display:flex;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:260px;
+    min-height:100vh;
+    background:linear-gradient(
+        180deg,
+        #0f172a,
+        #1e293b
+    );
+    color:white;
+    position:fixed;
+}
+
+.sidebar h2{
+    text-align:center;
+    padding:30px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar button{
+    width:100%;
+    padding:16px;
+    border:none;
+    background:none;
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    text-align:left;
+    padding-left:30px;
+    transition:0.3s;
+}
+
+.sidebar button:hover{
+    background:#1e293b;
+}
+
+/* Content */
+
+.content{
+    margin-left:250px;
+    width:calc(100% - 250px);
+    padding:30px;
+}
+
+/* Cards */
+
+.section{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    max-width:1000px;
+}
+
+.section h2{
+    margin-bottom:20px;
+    color:#0f172a;
+}
+
+/* Inputs */
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    font-size:14px;
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+/* Buttons */
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+/* Login */
+
+#loginPage{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(
+        135deg,
+        #0f172a,
+        #1e3a8a
+    );
+}
+
+.login-card{
+    width:400px;
+    background:white;
+    padding:35px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.login-card h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#0f172a;
+}
+
+.login-card button{
+    width:100%;
+}
+
+/* Lists */
+
+#siteList p,
+#structureList p{
+    padding:10px;
+    margin-bottom:8px;
+    background:#f8fafc;
+    border-radius:6px;
+    border-left:4px solid #2563eb;
+}
+
+/* Viewer Cards */
+
+#releasedList div{
+    background:#f8fafc;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:15px;
+    border-left:5px solid #16a34a;
+}
+
+#releasedList h4{
+    color:#0f172a;
+    margin-bottom:5px;
+}
+
+#releasedList p{
+    color:#475569;
+    margin-bottom:3px;
+}
+
+/* Horizontal line */
+
+hr{
+    margin:20px 0;
+    border:none;
+    border-top:1px solid #e2e8f0;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    .sidebar{
+        width:200px;
+    }
+
+    .content{
+        margin-left:200px;
+        width:calc(100% - 200px);
+    }
+
+}
+
+.cards{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.card{
+    width:220px;
+    padding:25px;
+    border-radius:15px;
+    color:white;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h3{
+    color:#64748b;
+}
+
+.card h1{
+    margin-top:10px;
+    color:#2563eb;
+}
