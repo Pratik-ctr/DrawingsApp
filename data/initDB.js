@@ -195,6 +195,11 @@ if (!existingAdmin) {
         "admin123",
         "Admin"
     );
+
+    logAction(
+    req.session.user.id,
+    `Created User ${username}`
+);
 }
 
 db.prepare(`

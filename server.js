@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
 const siteRoutes = require("./routes/sites");
 const structureRoutes = require("./routes/structures");
 const drawingRoutes = require("./routes/drawings");
@@ -27,13 +28,9 @@ app.use(
   })
 );
 
-/*
-====================================
-ROUTES
-====================================
-*/
-
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+
 app.use("/api/sites", siteRoutes);
 app.use("/api/structures", structureRoutes);
 app.use("/api/drawings", drawingRoutes);
@@ -42,13 +39,6 @@ app.use("/api/logs", logRoutes);
 app.use("/api/approvals", approvalRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-
-
-/*
-====================================
-HOME
-====================================
-*/
 
 const path = require("path");
 

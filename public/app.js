@@ -14,6 +14,7 @@ async function login() {
         `${API}/api/auth/login`,
         {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -28,11 +29,11 @@ async function login() {
 
     if (data.success) {
 
-    currentUser = data.user;
+        currentUser = data.user;
 
-    document.getElementById(
-        "loginPage"
-    ).style.display = "none";
+        document.getElementById(
+            "loginPage"
+        ).style.display = "none";
 
         document.getElementById(
             "dashboardPage"
@@ -44,6 +45,13 @@ async function login() {
         loadDrawings();
 
         applyRoleAccess();
+        if (
+            currentUser.role ===
+            "ADMIN"
+        ) {
+            loadUsers();
+            loadLogs();
+        }
 
 
 
@@ -64,60 +72,60 @@ function logout() {
 
 }
 
-function applyRoleAccess(){
+function applyRoleAccess() {
 
-    if(!currentUser){
+    if (!currentUser) {
         return;
     }
 
     const role = currentUser.role;
 
     // ADMIN
-    if(role === "ADMIN"){
+    if (role === "ADMIN") {
         return;
     }
 
     // DESIGNER
-    if(role === "DESIGNER"){
+    if (role === "DESIGNER") {
 
-        document.getElementById("menuDashboard").style.display="none";
-        document.getElementById("menuSites").style.display="none";
-        document.getElementById("menuStructures").style.display="none";
-        document.getElementById("menuApprovals").style.display="none";
+        document.getElementById("menuDashboard").style.display = "none";
+        document.getElementById("menuSites").style.display = "none";
+        document.getElementById("menuStructures").style.display = "none";
+        document.getElementById("menuApprovals").style.display = "none";
+        document.getElementById("menuUsers").style.display = "none";
+        document.getElementById("menuLogs").style.display = "none";
 
         showSection("drawings");
     }
 
     // APPROVER
-    if(role === "APPROVER"){
+    if (role === "APPROVER") {
 
-        document.getElementById("menuDashboard").style.display="none";
-        document.getElementById("menuSites").style.display="none";
-        document.getElementById("menuStructures").style.display="none";
-        document.getElementById("menuDrawings").style.display="none";
-        document.getElementById("menuNFA").style.display="none";
+        document.getElementById("menuDashboard").style.display = "none";
+        document.getElementById("menuSites").style.display = "none";
+        document.getElementById("menuStructures").style.display = "none";
+        document.getElementById("menuDrawings").style.display = "none";
+        document.getElementById("menuNFA").style.display = "none";
+        document.getElementById("menuUsers").style.display = "none";
+        document.getElementById("menuLogs").style.display = "none";
 
         showSection("approvals");
     }
 
     // VIEWER
-    if(role === "VIEWER"){
+    if (role === "VIEWER") {
 
-    document.getElementById("menuDashboard").style.display = "none";
+        document.getElementById("menuDashboard").style.display = "none";
+        document.getElementById("menuSites").style.display = "none";
+        document.getElementById("menuStructures").style.display = "none";
+        document.getElementById("menuDrawings").style.display = "none";
+        document.getElementById("menuNFA").style.display = "none";
+        document.getElementById("menuApprovals").style.display = "none";
+        document.getElementById("menuUsers").style.display = "none";
+        document.getElementById("menuLogs").style.display = "none";
+        showSection("viewer");
 
-    document.getElementById("menuSites").style.display = "none";
-
-    document.getElementById("menuStructures").style.display = "none";
-
-    document.getElementById("menuDrawings").style.display = "none";
-
-    document.getElementById("menuNFA").style.display = "none";
-
-    document.getElementById("menuApprovals").style.display = "none";
-
-    showSection("viewer");
-
-}
+    }
 
 }
 
@@ -480,26 +488,26 @@ async function rejectRevision() {
     alert(result.message || "Revision Rejected");
 }
 
-async function loadReleasedDrawings(){
+async function loadReleasedDrawings() {
 
     const response =
-    await fetch(
-        `${API}/api/drawings/released`
-    );
+        await fetch(
+            `${API}/api/drawings/released`
+        );
 
     const result =
-    await response.json();
+        await response.json();
 
     const drawings =
-    Array.isArray(result)
-        ? result
-        : Array.isArray(result.data)
-            ? result.data
-            : [];
+        Array.isArray(result)
+            ? result
+            : Array.isArray(result.data)
+                ? result.data
+                : [];
 
     let html = "";
 
-    drawings.forEach(item=>{
+    drawings.forEach(item => {
 
         html += `
         <div style="
@@ -537,7 +545,7 @@ async function loadReleasedDrawings(){
     document.getElementById(
         "releasedList"
     ).innerHTML =
-    html || "<p>No Released Drawings</p>";
+        html || "<p>No Released Drawings</p>";
 
 }
 
@@ -808,15 +816,15 @@ Download
 
 }
 
-async function loadPendingApprovals(){
+async function loadPendingApprovals() {
 
     const response =
-    await fetch(
-        `${API}/api/approvals/pending`
-    );
+        await fetch(
+            `${API}/api/approvals/pending`
+        );
 
     const approvals =
-    await response.json();
+        await response.json();
 
     let html = "";
 
@@ -868,40 +876,40 @@ async function loadPendingApprovals(){
     document.getElementById(
         "pendingApprovals"
     ).innerHTML =
-    html || "No pending approvals";
+        html || "No pending approvals";
 
 }
 
 async function approveRevisionById(
     revision_id
-){
+) {
 
     const comment =
-    document.getElementById(
-        `comment-${revision_id}`
-    ).value;
+        document.getElementById(
+            `comment-${revision_id}`
+        ).value;
 
     const response =
-    await fetch(
-        `${API}/api/approvals/approve`,
-        {
-            method:"POST",
+        await fetch(
+            `${API}/api/approvals/approve`,
+            {
+                method: "POST",
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body:JSON.stringify({
-                revision_id,
-                stage_id:1,
-                approver_id: currentUser.id,
-                comment
-            })
-        }
-    );
+                body: JSON.stringify({
+                    revision_id,
+                    stage_id: 1,
+                    approver_id: currentUser.id,
+                    comment
+                })
+            }
+        );
 
     const result =
-    await response.json();
+        await response.json();
 
     alert(
         result.message ||
@@ -914,34 +922,34 @@ async function approveRevisionById(
 
 async function rejectRevisionById(
     revision_id
-){
+) {
 
     const comment =
-    document.getElementById(
-        `comment-${revision_id}`
-    ).value;
+        document.getElementById(
+            `comment-${revision_id}`
+        ).value;
 
     const response =
-    await fetch(
-        `${API}/api/approvals/reject`,
-        {
-            method:"POST",
+        await fetch(
+            `${API}/api/approvals/reject`,
+            {
+                method: "POST",
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body:JSON.stringify({
-                revision_id,
-                stage_id:1,
-                approver_id:1,
-                comment
-            })
-        }
-    );
+                body: JSON.stringify({
+                    revision_id,
+                    stage_id: 1,
+                    approver_id: 1,
+                    comment
+                })
+            }
+        );
 
     const result =
-    await response.json();
+        await response.json();
 
     alert(
         result.message ||
@@ -952,15 +960,15 @@ async function rejectRevisionById(
 
 }
 
-async function loadDashboard(){
+async function loadDashboard() {
 
     const response =
-    await fetch(
-        `${API}/api/dashboard`
-    );
+        await fetch(
+            `${API}/api/dashboard`
+        );
 
     const data =
-    await response.json();
+        await response.json();
 
     document.getElementById(
         "dashboardCards"
@@ -996,5 +1004,218 @@ async function loadDashboard(){
     </div>
 
     `;
+
+}
+
+async function createUser() {
+
+    const username =
+        document.getElementById(
+            "newUsername"
+        ).value;
+
+    const password =
+        document.getElementById(
+            "newPassword"
+        ).value;
+
+    const role =
+        document.getElementById(
+            "newRole"
+        ).value;
+
+    const response = await fetch(
+        `${API}/api/users/create`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                password,
+                role
+            })
+        }
+    );
+
+    const result =
+        await response.json();
+
+    alert("User Created");
+
+    loadUsers();
+
+}
+
+async function loadUsers() {
+
+    const response =
+        await fetch(
+            `${API}/api/users`
+        );
+
+    const result =
+        await response.json();
+
+    const users =
+        Array.isArray(result)
+            ? result
+            : [];
+
+    let html = "";
+
+    users.forEach(user => {
+
+        html += `
+    <div style="
+        padding:10px;
+        margin-bottom:10px;
+        border:1px solid #ddd;
+        border-radius:8px;
+    ">
+
+        <strong>
+        ${user.username}
+        </strong>
+
+        <br>
+
+        ${user.role}
+
+        <br><br>
+
+        <button
+        onclick="deleteUser(${user.id})">
+            Delete
+        </button>
+
+        <button
+        onclick="resetPassword(${user.id})"
+        style="margin-left:10px;">
+            Reset Password
+        </button>
+
+    </div>
+    `;
+
+    });
+
+    document.getElementById(
+        "userList"
+    ).innerHTML = html;
+
+}
+
+async function deleteUser(id) {
+
+    const ok =
+        confirm(
+            "Delete this user?"
+        );
+
+    if (!ok) {
+        return;
+    }
+
+    await fetch(
+        `${API}/api/users/${id}`,
+        {
+            method: "DELETE"
+        }
+    );
+
+    loadUsers();
+
+}
+
+async function resetPassword(id) {
+
+    const password =
+        prompt(
+            "Enter New Password"
+        );
+
+    if (!password) {
+        return;
+    }
+
+    const response =
+        await fetch(
+            `${API}/api/users/reset-password`,
+            {
+                method: "PUT",
+
+                credentials: "include",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    id,
+                    password
+                })
+            }
+        );
+
+    const result =
+        await response.json();
+
+    alert(
+        result.message
+    );
+
+}
+
+async function loadLogs() {
+
+    const response =
+        await fetch(
+            `${API}/api/logs`
+        );
+
+    const logs =
+        await response.json();
+
+    let html = "";
+
+    logs.forEach(log => {
+
+        html += `
+        <div style="
+            padding:10px;
+            margin-bottom:10px;
+            border:1px solid #ddd;
+            border-radius:8px;
+        ">
+
+            <strong>
+                ${log.action}
+            </strong>
+
+            <br>
+
+            ${log.created_at}
+
+        </div>
+        `;
+
+    });
+
+    document.getElementById(
+        "logsList"
+    ).innerHTML = html;
+
+}
+
+function exportLogsCSV(){
+
+    window.open(
+        `${API}/api/logs/export-csv`,
+        "_blank"
+    );
 
 }

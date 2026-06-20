@@ -86,19 +86,19 @@ router.post("/approve",requireApprover, (req, res) => {
 
     }
 
-    // Normal Approval
-    db.prepare(`
-      UPDATE revisions
-      SET
-        current_stage = current_stage + 1,
-        approval_status = 'APPROVED'
-      WHERE id = ?
-    `).run(revision_id);
+    // Release Immediately
+db.prepare(`
+  UPDATE revisions
+  SET
+    approval_status = 'RELEASED',
+    release_date = date('now')
+  WHERE id = ?
+`).run(revision_id);
 
-    res.json({
-      success: true,
-      message: "Revision Approved"
-    });
+res.json({
+    success: true,
+    message: "Drawing Released"
+});
 
   } catch (error) {
 

@@ -4,9 +4,7 @@ function requireAdmin(
     next
 ){
 
-    if(
-        !req.session.user
-    ){
+    if(!req.session.user){
         return res
         .status(401)
         .json({
@@ -15,8 +13,8 @@ function requireAdmin(
     }
 
     if(
-        req.session.user.role !==
-        "ADMIN"
+        req.session.user.role
+        .toUpperCase() !== "ADMIN"
     ){
         return res
         .status(403)
@@ -35,9 +33,7 @@ function requireDesigner(
     next
 ){
 
-    if(
-        !req.session.user
-    ){
+    if(!req.session.user){
         return res
         .status(401)
         .json({
@@ -46,8 +42,8 @@ function requireDesigner(
     }
 
     if(
-        req.session.user.role !==
-        "DESIGNER"
+        req.session.user.role
+        .toUpperCase() !== "DESIGNER"
     ){
         return res
         .status(403)
@@ -66,9 +62,7 @@ function requireApprover(
     next
 ){
 
-    if(
-        !req.session.user
-    ){
+    if(!req.session.user){
         return res
         .status(401)
         .json({
@@ -77,8 +71,8 @@ function requireApprover(
     }
 
     if(
-        req.session.user.role !==
-        "APPROVER"
+        req.session.user.role
+        .toUpperCase() !== "APPROVER"
     ){
         return res
         .status(403)
@@ -97,9 +91,7 @@ function requireViewer(
     next
 ){
 
-    if(
-        !req.session.user
-    ){
+    if(!req.session.user){
         return res
         .status(401)
         .json({
@@ -108,8 +100,8 @@ function requireViewer(
     }
 
     if(
-        req.session.user.role !==
-        "VIEWER"
+        req.session.user.role
+        .toUpperCase() !== "VIEWER"
     ){
         return res
         .status(403)

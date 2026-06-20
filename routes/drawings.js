@@ -4,9 +4,8 @@ const router = express.Router();
 const db = require("../data/database");
 const upload = require("../middleware/upload");
 
-/* ==========================================
-   CREATE DRAWING
-========================================== */
+
+//CREATE DRAWING
 
 router.post("/create", (req, res) => {
   const { site_id, structure_id } = req.body;
@@ -197,10 +196,10 @@ router.get("/released", (req, res) => {
       FROM revisions r
       JOIN drawings d
       ON d.id = r.drawing_id
-      WHERE r.status = 'RELEASED'
+      WHERE r.approval_status = 'RELEASED'
     `).all();
 
-    res.json(released);
+    res.json(data);
 
   } catch (err) {
 
@@ -380,6 +379,23 @@ router.get("/pending",(req,res)=>{
     `).all();
 
     res.json(pending);
+
+});
+
+router.get("/debug-revisions", (req,res)=>{
+
+    const data = db.prepare(`
+        SELECT
+            id,
+            revision_no,
+            status,
+            approval_status,
+            release_date
+        FROM revisions
+        ORDER BY id DESC
+    `).all();
+
+    res.json(data);
 
 });
 

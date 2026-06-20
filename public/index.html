@@ -68,6 +68,14 @@
                     Viewer
                 </button>
 
+                <button id="menuUsers" onclick="showSection('users')">
+                    Users
+                </button>
+
+                <button id="menuLogs" onclick="showSection('logs')">
+                    Activity Logs
+                </button>
+
                 <button onclick="logout()">
                     Logout
                 </button>
@@ -244,6 +252,72 @@
 
                     <div id="pendingApprovals">
                         No pending approvals
+                    </div>
+
+                </div>
+
+                <!-- USERS -->
+
+                <div id="users" class="section" style="display:none;">
+
+                    <h2>User Management</h2>
+
+                    <input id="newUsername" placeholder="Username">
+
+                    <input id="newPassword" placeholder="Password">
+
+                    <select id="newRole">
+
+                        <option value="ADMIN">
+                            ADMIN
+                        </option>
+
+                        <option value="DESIGNER">
+                            DESIGNER
+                        </option>
+
+                        <option value="APPROVER">
+                            APPROVER
+                        </option>
+
+                        <option value="VIEWER">
+                            VIEWER
+                        </option>
+
+                    </select>
+
+                    <button onclick="createUser()">
+                        Create User
+                    </button>
+
+                    <hr>
+
+                    <div id="userList">
+                        No Users
+                    </div>
+
+                </div>
+
+                <!-- LOGS -->
+
+                <div id="logs" class="section" style="display:none;">
+
+                    <h2>Activity Logs</h2>
+
+                    <button onclick="loadLogs()">
+                        Refresh Logs
+                    </button>
+
+                    <button onclick="exportLogsCSV()">
+                        Export CSV
+                    </button>
+
+                    <hr>
+
+                    <div id="logsList">
+
+                        No Logs Found
+
                     </div>
 
                 </div>
