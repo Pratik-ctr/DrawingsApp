@@ -285,33 +285,51 @@ async function loadStructures() {
 }
 
 async function createDrawing() {
-    const site_id = document.getElementById("drawingSiteId").value;
-    const structure_id = document.getElementById("drawingStructureId").value;
+
+    const site_id =
+    document.getElementById(
+        "drawingSite"
+    ).value;
+
+    const structure_id =
+    document.getElementById(
+        "drawingStructure"
+    ).value;
 
     if (!site_id || !structure_id) {
-        alert("Please enter both Site ID and Structure ID");
+        alert("Please select Site and Structure");
         return;
     }
 
-    const response = await fetch(`${API}/api/drawings/create`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            site_id,
-            structure_id
-        })
-    });
+    const response = await fetch(
+        `${API}/api/drawings/create`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                site_id,
+                structure_id
+            })
+        }
+    );
 
     const result = await response.json();
 
     if (!response.ok) {
-        alert(result.message || result.error || "Failed to create drawing");
+        alert(
+            result.message ||
+            result.error ||
+            "Failed to create drawing"
+        );
         return;
     }
 
-    alert(result.message || "Drawing Created");
+    alert("Drawing Created Successfully");
+
+    loadDrawings();
+
 }
 
 async function createRevision() {
@@ -507,40 +525,32 @@ async function loadReleasedDrawings() {
 
     let html = "";
 
-    drawings.forEach(item => {
+    drawings.forEach((item) => {
 
-        html += `
-        <div style="
-            background:#f8fafc;
-            padding:15px;
-            margin-bottom:10px;
-            border-left:5px solid green;
-            border-radius:8px;
-        ">
+    html += `
+        <div class="card">
 
-            <h3>
-                ${item.drawing_name || "Unnamed Drawing"}
-            </h3>
+            <h4>${item.drawing_name}</h4>
 
             <p>
-                Revision :
-                ${item.revision_no || "-"}
+                Revision : ${item.revision_no}
             </p>
 
             <p>
-                Released :
-                ${item.release_date || "-"}
+                Status : ${item.approval_status}
             </p>
 
-            <p>
-                Status :
-                ${item.approval_status || "RELEASED"}
-            </p>
+            <button
+                onclick="downloadFile(${item.file_id})">
+                Download
+            </button>
+
+            <hr>
 
         </div>
-        `;
+    `;
 
-    });
+});
 
     document.getElementById(
         "releasedList"
@@ -1215,6 +1225,15 @@ function exportLogsCSV(){
 
     window.open(
         `${API}/api/logs/export-csv`,
+        "_blank"
+    );
+
+}
+
+function downloadFile(fileId){
+
+    window.open(
+        `${API}/api/drawings/download/${fileId}`,
         "_blank"
     );
 

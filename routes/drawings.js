@@ -191,11 +191,23 @@ router.get("/released", (req, res) => {
 
     const data = db.prepare(`
       SELECT
-        r.*,
-        d.drawing_name
+        r.id AS revision_id,
+        r.revision_no,
+        r.approval_status,
+
+        d.drawing_name,
+
+        f.id AS file_id,
+        f.file_name
+
       FROM revisions r
+
       JOIN drawings d
       ON d.id = r.drawing_id
+
+      LEFT JOIN files f
+      ON f.revision_id = r.id
+
       WHERE r.approval_status = 'RELEASED'
     `).all();
 
@@ -204,8 +216,8 @@ router.get("/released", (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      success: false,
-      error: err.message
+      success:false,
+      error:err.message
     });
 
   }
