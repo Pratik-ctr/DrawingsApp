@@ -2,6 +2,96 @@ const API = "http://localhost:4000";
 
 let currentUser = null;
 
+function textValue(value, fallback = "") {
+    if (value === null || value === undefined || value === "") {
+        return fallback;
+    }
+
+    return String(value);
+}
+
+function setChildren(id, children, emptyText = "") {
+    const element = document.getElementById(id);
+    const nodes = Array.isArray(children)
+        ? children
+        : [children];
+
+    if (nodes.length === 0 && emptyText) {
+        element.textContent = emptyText;
+        return;
+    }
+
+    element.replaceChildren(...nodes);
+}
+
+function element(tag, options = {}, children = []) {
+    const node = document.createElement(tag);
+
+    if (options.className) {
+        node.className = options.className;
+    }
+
+    if (options.style) {
+        node.setAttribute("style", options.style);
+    }
+
+    if (options.href) {
+        node.href = options.href;
+    }
+
+    if (options.target) {
+        node.target = options.target;
+    }
+
+    if (options.id) {
+        node.id = options.id;
+    }
+
+    if (options.value !== undefined) {
+        node.value = String(options.value);
+    }
+
+    if (options.placeholder) {
+        node.placeholder = options.placeholder;
+    }
+
+    if (options.text !== undefined) {
+        node.textContent = textValue(options.text);
+    }
+
+    if (options.onClick) {
+        node.addEventListener("click", options.onClick);
+    }
+
+    children.forEach(child => {
+        if (typeof child === "string") {
+            node.appendChild(document.createTextNode(child));
+            return;
+        }
+
+        node.appendChild(child);
+    });
+
+    return node;
+}
+
+function optionNode(value, label) {
+    return element("option", {
+        value,
+        text: label
+    });
+}
+
+function line(text) {
+    return element("p", {
+        text
+    });
+}
+
+function downloadUrl(fileId) {
+    return `${API}/api/drawings/download/${encodeURIComponent(fileId)}`;
+}
+
 async function login() {
 
     const username =
@@ -186,31 +276,18 @@ async function loadSites() {
             ? result.data
             : [];
 
-    let html = "";
+    const siteItems =
+        sites.map(site =>
+            line(site.site_name)
+        );
 
-    let options = "";
+    const siteOptions =
+        sites.map(site =>
+            optionNode(site.id, site.site_name)
+        );
 
-    sites.forEach(site => {
-
-        html += `
-        <p>${site.site_name}</p>
-        `;
-
-        options += `
-        <option value="${site.id}">
-            ${site.site_name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "siteList"
-    ).innerHTML = html;
-
-    document.getElementById(
-        "siteSelect"
-    ).innerHTML = options;
+    setChildren("siteList", siteItems);
+    setChildren("siteSelect", siteOptions);
 
 }
 
@@ -268,19 +345,12 @@ async function loadStructures() {
                 ? result.data
                 : [];
 
-    let html = "";
-
-    structures.forEach(item => {
-
-        html += `
-        <p>${item.structure_name}</p>
-        `;
-
-    });
-
-    document.getElementById(
-        "structureList"
-    ).innerHTML = html;
+    setChildren(
+        "structureList",
+        structures.map(item =>
+            line(item.structure_name)
+        )
+    );
 
 }
 
@@ -365,8 +435,8 @@ async function createRevision() {
 
     document.getElementById(
         "revisionResult"
-    ).innerHTML =
-        `Revision Created : ${result.revision}`;
+    ).textContent =
+        `Revision Created : ${textValue(result.revision)}`;
 
     loadRevisions();
     loadRevisionHistory();
@@ -523,39 +593,28 @@ async function loadReleasedDrawings() {
                 ? result.data
                 : [];
 
-    let html = "";
+    const cards = drawings.map(item => {
+        const card = element("div", {
+            className: "card"
+        }, [
+            element("h4", { text: item.drawing_name }),
+            line(`Revision : ${textValue(item.revision_no)}`),
+            line(`Status : ${textValue(item.approval_status)}`),
+            element("button", {
+                text: "Download",
+                onClick: () => downloadFile(item.file_id)
+            }),
+            element("hr")
+        ]);
 
-    drawings.forEach((item) => {
+        return card;
+    });
 
-    html += `
-        <div class="card">
-
-            <h4>${item.drawing_name}</h4>
-
-            <p>
-                Revision : ${item.revision_no}
-            </p>
-
-            <p>
-                Status : ${item.approval_status}
-            </p>
-
-            <button
-                onclick="downloadFile(${item.file_id})">
-                Download
-            </button>
-
-            <hr>
-
-        </div>
-    `;
-
-});
-
-    document.getElementById(
-        "releasedList"
-    ).innerHTML =
-        html || "<p>No Released Drawings</p>";
+    setChildren(
+        "releasedList",
+        cards,
+        "No Released Drawings"
+    );
 
 }
 
@@ -576,21 +635,12 @@ async function loadDrawings() {
                 ? result.data
                 : [];
 
-    let options = "";
-
-    drawings.forEach(drawing => {
-
-        options += `
-        <option value="${drawing.id}">
-            ${drawing.drawing_name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "drawingSelect"
-    ).innerHTML = options;
+    setChildren(
+        "drawingSelect",
+        drawings.map(drawing =>
+            optionNode(drawing.id, drawing.drawing_name)
+        )
+    );
 
 }
 
@@ -620,21 +670,12 @@ async function loadRevisions() {
                 ? result.data
                 : [];
 
-    let options = "";
-
-    revisions.forEach(revision => {
-
-        options += `
-        <option value="${revision.id}">
-            ${revision.revision_no}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "revisionSelect"
-    ).innerHTML = options;
+    setChildren(
+        "revisionSelect",
+        revisions.map(revision =>
+            optionNode(revision.id, revision.revision_no)
+        )
+    );
 
 }
 
@@ -658,21 +699,12 @@ async function loadDrawingStructures() {
             ? result
             : result.data || [];
 
-    let options = "";
-
-    structures.forEach(item => {
-
-        options += `
-        <option value="${item.id}">
-            ${item.structure_name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "drawingStructure"
-    ).innerHTML = options;
+    setChildren(
+        "drawingStructure",
+        structures.map(item =>
+            optionNode(item.id, item.structure_name)
+        )
+    );
 
 }
 
@@ -691,21 +723,12 @@ async function loadDrawingSites() {
             ? result
             : result.data || [];
 
-    let options = "";
-
-    sites.forEach(site => {
-
-        options += `
-        <option value="${site.id}">
-            ${site.site_name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        "drawingSite"
-    ).innerHTML = options;
+    setChildren(
+        "drawingSite",
+        sites.map(site =>
+            optionNode(site.id, site.site_name)
+        )
+    );
 
     loadDrawingStructures();
 
@@ -730,32 +753,31 @@ async function loadRevisionHistory() {
     const revisions =
         await response.json();
 
-    let html = `
-        <table style="width:100%">
-            <tr>
-                <th>Revision</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-    `;
-
-    revisions.forEach(item => {
-
-        html += `
-        <tr>
-            <td>${item.revision_no}</td>
-            <td>${item.approval_status || item.status || 'IN_REVIEW'}</td>
-            <td>${item.created_at || '-'}</td>
-        </tr>
-        `;
-
+    const table = element("table", {
+        style: "width:100%"
     });
 
-    html += `</table>`;
+    const headerRow = element("tr", {}, [
+        element("th", { text: "Revision" }),
+        element("th", { text: "Status" }),
+        element("th", { text: "Date" })
+    ]);
 
-    document.getElementById(
-        "revisionHistory"
-    ).innerHTML = html;
+    table.appendChild(headerRow);
+
+    revisions.forEach(item => {
+        table.appendChild(
+            element("tr", {}, [
+                element("td", { text: item.revision_no }),
+                element("td", {
+                    text: item.approval_status || item.status || "IN_REVIEW"
+                }),
+                element("td", { text: item.created_at || "-" })
+            ])
+        );
+    });
+
+    setChildren("revisionHistory", table);
 
 }
 
@@ -783,46 +805,27 @@ async function loadFiles() {
             ? result
             : result.data || [];
 
-    let html = "";
+    const fileNodes = files.map(file =>
+        element("div", {
+            style: `
+                padding:10px;
+                margin:10px 0;
+                background:#f8fafc;
+                border-left:4px solid #2563eb;
+            `
+        }, [
+            element("strong", { text: file.file_name }),
+            element("br"),
+            element("br"),
+            element("a", {
+                href: downloadUrl(file.id),
+                target: "_blank",
+                text: "Download"
+            })
+        ])
+    );
 
-    files.forEach(file => {
-
-        html += `
-        <div style="
-            padding:10px;
-            margin:10px 0;
-            background:#f8fafc;
-            border-left:4px solid #2563eb;
-        ">
-            <div style="
-padding:10px;
-margin:10px 0;
-background:#f8fafc;
-border-left:4px solid #2563eb;
-">
-
-<strong>${file.file_name}</strong>
-
-<br><br>
-
-<a
-href="${API}/api/drawings/download/${file.id}"
-target="_blank">
-
-Download
-
-</a>
-
-</div>
-        </div>
-        `;
-
-    });
-
-    document.getElementById(
-        "fileList"
-    ).innerHTML =
-        html || "No files found";
+    setChildren("fileList", fileNodes, "No files found");
 
 }
 
@@ -836,57 +839,41 @@ async function loadPendingApprovals() {
     const approvals =
         await response.json();
 
-    let html = "";
+    const approvalNodes = approvals.map(item =>
+        element("div", {
+            style: `
+                background:#f8fafc;
+                padding:20px;
+                margin-bottom:15px;
+                border-left:5px solid #2563eb;
+                border-radius:8px;
+            `
+        }, [
+            element("h3", { text: item.drawing_name }),
+            line(`Revision: ${textValue(item.revision_no)}`),
+            line(`Status: ${textValue(item.approval_status)}`),
+            element("textarea", {
+                id: `comment-${item.id}`,
+                placeholder: "Comment"
+            }),
+            element("br"),
+            element("br"),
+            element("button", {
+                text: "Approve",
+                onClick: () => approveRevisionById(item.id)
+            }),
+            element("button", {
+                text: "Reject",
+                onClick: () => rejectRevisionById(item.id)
+            })
+        ])
+    );
 
-    approvals.forEach(item => {
-
-        html += `
-        <div style="
-            background:#f8fafc;
-            padding:20px;
-            margin-bottom:15px;
-            border-left:5px solid #2563eb;
-            border-radius:8px;
-        ">
-
-            <h3>${item.drawing_name}</h3>
-
-            <p>
-                Revision:
-                ${item.revision_no}
-            </p>
-
-            <p>
-                Status:
-                ${item.approval_status}
-            </p>
-
-            <textarea
-                id="comment-${item.id}"
-                placeholder="Comment">
-            </textarea>
-
-            <br><br>
-
-            <button
-            onclick="approveRevisionById(${item.id})">
-                Approve
-            </button>
-
-            <button
-            onclick="rejectRevisionById(${item.id})">
-                Reject
-            </button>
-
-        </div>
-        `;
-
-    });
-
-    document.getElementById(
-        "pendingApprovals"
-    ).innerHTML =
-        html || "No pending approvals";
+    setChildren(
+        "pendingApprovals",
+        approvalNodes,
+        "No pending approvals"
+    );
 
 }
 
@@ -980,40 +967,27 @@ async function loadDashboard() {
     const data =
         await response.json();
 
-    document.getElementById(
-        "dashboardCards"
-    ).innerHTML = `
+    const cards = [
+        ["Sites", data.sites],
+        ["Structures", data.structures],
+        ["Drawings", data.drawings],
+        ["Pending", data.pending],
+        ["Released", data.released]
+    ].map(([label, value]) =>
+        element("div", {
+            className: "card"
+        }, [
+            element("h3", { text: label }),
+            element("h1", { text: value })
+        ])
+    );
 
-    <div class="cards">
-
-        <div class="card">
-            <h3>Sites</h3>
-            <h1>${data.sites}</h1>
-        </div>
-
-        <div class="card">
-            <h3>Structures</h3>
-            <h1>${data.structures}</h1>
-        </div>
-
-        <div class="card">
-            <h3>Drawings</h3>
-            <h1>${data.drawings}</h1>
-        </div>
-
-        <div class="card">
-            <h3>Pending</h3>
-            <h1>${data.pending}</h1>
-        </div>
-
-        <div class="card">
-            <h3>Released</h3>
-            <h1>${data.released}</h1>
-        </div>
-
-    </div>
-
-    `;
+    setChildren(
+        "dashboardCards",
+        element("div", {
+            className: "cards"
+        }, cards)
+    );
 
 }
 
@@ -1074,47 +1048,33 @@ async function loadUsers() {
             ? result
             : [];
 
-    let html = "";
+    const userNodes = users.map(user =>
+        element("div", {
+            style: `
+                padding:10px;
+                margin-bottom:10px;
+                border:1px solid #ddd;
+                border-radius:8px;
+            `
+        }, [
+            element("strong", { text: user.username }),
+            element("br"),
+            textValue(user.role),
+            element("br"),
+            element("br"),
+            element("button", {
+                text: "Delete",
+                onClick: () => deleteUser(user.id)
+            }),
+            element("button", {
+                style: "margin-left:10px;",
+                text: "Reset Password",
+                onClick: () => resetPassword(user.id)
+            })
+        ])
+    );
 
-    users.forEach(user => {
-
-        html += `
-    <div style="
-        padding:10px;
-        margin-bottom:10px;
-        border:1px solid #ddd;
-        border-radius:8px;
-    ">
-
-        <strong>
-        ${user.username}
-        </strong>
-
-        <br>
-
-        ${user.role}
-
-        <br><br>
-
-        <button
-        onclick="deleteUser(${user.id})">
-            Delete
-        </button>
-
-        <button
-        onclick="resetPassword(${user.id})"
-        style="margin-left:10px;">
-            Reset Password
-        </button>
-
-    </div>
-    `;
-
-    });
-
-    document.getElementById(
-        "userList"
-    ).innerHTML = html;
+    setChildren("userList", userNodes);
 
 }
 
@@ -1190,34 +1150,22 @@ async function loadLogs() {
     const logs =
         await response.json();
 
-    let html = "";
+    const logNodes = logs.map(log =>
+        element("div", {
+            style: `
+                padding:10px;
+                margin-bottom:10px;
+                border:1px solid #ddd;
+                border-radius:8px;
+            `
+        }, [
+            element("strong", { text: log.action }),
+            element("br"),
+            textValue(log.created_at)
+        ])
+    );
 
-    logs.forEach(log => {
-
-        html += `
-        <div style="
-            padding:10px;
-            margin-bottom:10px;
-            border:1px solid #ddd;
-            border-radius:8px;
-        ">
-
-            <strong>
-                ${log.action}
-            </strong>
-
-            <br>
-
-            ${log.created_at}
-
-        </div>
-        `;
-
-    });
-
-    document.getElementById(
-        "logsList"
-    ).innerHTML = html;
+    setChildren("logsList", logNodes);
 
 }
 
@@ -1233,7 +1181,7 @@ function exportLogsCSV(){
 function downloadFile(fileId){
 
     window.open(
-        `${API}/api/drawings/download/${fileId}`,
+        downloadUrl(fileId),
         "_blank"
     );
 
